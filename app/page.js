@@ -763,19 +763,6 @@ export default function Home() {
                     onChange={(e) => setEndDate(e.target.value)}
                   />
                 </div>
-
-                <div className="setting-group">
-                  <label className="setting-label">Hours to Fetch</label>
-                  <input
-                    type="number"
-                    className="setting-input"
-                    value={hoursToFetch}
-                    onChange={(e) => setHoursToFetch(parseInt(e.target.value))}
-                    min="1"
-                    max="720"
-                    placeholder="24"
-                  />
-                </div>
               </>
             )}
 
