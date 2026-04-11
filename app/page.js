@@ -769,16 +769,35 @@ export default function Home() {
             <div className="setting-group">
               <label className="setting-label">Symbol</label>
               <select
-                className="setting-select"
-                value={symbol}
-                onChange={(e) => setSymbol(e.target.value)}
-                disabled={dataSource === 'sample'}
-              >
-                <option value="XAUUSD">XAU/USD (Gold)</option>
-                <option value="EURUSD">EUR/USD</option>
-                <option value="GBPUSD">GBP/USD</option>
-                <option value="BTCUSD">BTC/USD</option>
-              </select>
+  className="setting-select"
+  value={symbol}
+  onChange={(e) => setSymbol(e.target.value)}
+  disabled={dataSource === 'sample'}
+>
+  {/* Metals */}
+  <option value="XAUUSD">XAU/USD (Gold)</option>
+
+  {/* Major Forex */}
+  <option value="EURUSD">EUR/USD</option>
+  <option value="GBPUSD">GBP/USD</option>
+  <option value="USDJPY">USD/JPY</option>
+  <option value="USDCHF">USD/CHF</option>
+  <option value="USDCAD">USD/CAD</option>
+  <option value="AUDUSD">AUD/USD</option>
+  <option value="NZDUSD">NZD/USD</option>
+
+  {/* Cross pairs (popular) */}
+  <option value="EURGBP">EUR/GBP</option>
+  <option value="EURJPY">EUR/JPY</option>
+  <option value="GBPJPY">GBP/JPY</option>
+  <option value="AUDJPY">AUD/JPY</option>
+
+  {/* Crypto */}
+  <option value="BTCUSD">BTC/USD</option>
+  <option value="ETHUSD">ETH/USD</option>
+  <option value="BNBUSD">BNB/USD</option>
+  <option value="SOLUSD">SOL/USD</option>
+</select>
             </div>
 
             <div className="setting-group">
