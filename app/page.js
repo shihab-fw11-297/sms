@@ -98,7 +98,7 @@ export default function Home() {
   const [apiKey, setApiKey] = useState('');
   const [symbol, setSymbol] = useState('XAUUSD');
   const [timeframe, setTimeframe] = useState('5m');
-  const [dataSource, setDataSource] = useState('sample'); // 'sample' or 'api'
+  const [dataSource, setDataSource] = useState('api'); // 'sample' or 'api'
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [hoursToFetch, setHoursToFetch] = useState(72); // 72 hours for 5M (Gold optimized)
@@ -741,30 +741,6 @@ export default function Home() {
         {/* Settings Panel */}
         <div className="settings-panel animate-in">
           <div className="settings-grid">
-            <div className="setting-group">
-              <label className="setting-label">Data Source</label>
-              <select
-                className="setting-select"
-                value={dataSource}
-                onChange={(e) => setDataSource(e.target.value)}
-              >
-                <option value="sample">Sample Data (No API Key Needed)</option>
-                <option value="api">Real API Data (Finage)</option>
-              </select>
-            </div>
-
-            {dataSource === 'api' && (
-              <div className="setting-group">
-                <label className="setting-label">API Key</label>
-                <input
-                  type="password"
-                  className="setting-input"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Enter Finage API key"
-                />
-              </div>
-            )}
 
             {dataSource === 'api' && (
               <>
