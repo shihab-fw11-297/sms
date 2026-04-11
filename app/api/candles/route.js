@@ -54,10 +54,15 @@ export async function GET(request) {
     };
 
     // Build Finage API endpoint
-    const endpoint = timeframe === '1D' 
-      ? `https://api.finage.co.uk/agg/forex/${symbol}/${finageTimeframe}/${formatDate(startDate)}/${formatDate(endDate)}`
-      : `https://api.finage.co.uk/agg/forex/${symbol}/${finageTimeframe}/minute/${formatDate(startDate)}/${formatDate(endDate)}`;
+   const isCrypto = ['BTCUSD', 'ETHUSD', 'BNBUSD', 'SOLUSD'].includes(symbol);
+// or better: symbol.includes('BTC') || symbol.includes('ETH')
 
+const endpoint = isCrypto
+  ? `https://api.finage.co.uk/agg/crypto/${symbol}/1/${finageTimeframe}/${formatDate(startDate)}/${formatDate(endDate)}`
+  : timeframe === '1D'
+    ? `https://api.finage.co.uk/agg/forex/${symbol}/${finageTimeframe}/${formatDate(startDate)}/${formatDate(endDate)}`
+    : `https://api.finage.co.uk/agg/forex/${symbol}/${finageTimeframe}/minute/${formatDate(startDate)}/${formatDate(endDate)}`;
+    
     const url = `${endpoint}?apikey=${apiKey}&limit=30000`;
 
     console.log(`Fetching: ${symbol} ${timeframe} from ${formatDate(startDate)} to ${formatDate(endDate)}`);
