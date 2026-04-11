@@ -1,112 +1,91 @@
-// app/api/candles/route.js
-
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
+
   const symbol = searchParams.get('symbol') || 'XAUUSD';
   const timeframe = searchParams.get('timeframe') || '5m';
-  
-  // Get API key from environment variable (NOT from query params)
+
   const apiKey = process.env.FINAGE_API_KEY;
 
   if (!apiKey) {
-    return Response.json({ 
-      error: 'API key not configured. Please add FINAGE_API_KEY to your .env.local file' 
+    return Response.json({
+      error: 'API key not configured'
     }, { status: 500 });
   }
 
-  // Map timeframe to Finage format
   const timeframeMap = {
-    '1m': '1',
-    '5m': '5',
-    '15m': '15',
-    '1h': '60',
-    '4h': '240',
-    '1D': 'D',
+    '1m': { multiply: 1, time: 'minute' },
+    '5m': { multiply: 5, time: 'minute' },
+    '15m': { multiply: 15, time: 'minute' },
+    '30m': { multiply: 30, time: 'minute' },
+    '1h': { multiply: 1, time: 'hour' },
+    '4h': { multiply: 4, time: 'hour' },
+    '1D': { multiply: 1, time: 'day' },
   };
 
-  const finageTimeframe = timeframeMap[timeframe] || '5';
-  
-  try {
-    // Get date range from query params or use defaults
-    let startDate, endDate;
-    
-    const startParam = searchParams.get('startDate');
-    const endParam = searchParams.get('endDate');
+  const { multiply, time } = timeframeMap[timeframe] || timeframeMap['5m'];
 
-    if(startParam && endParam) {
-      // Use provided date range
-      startDate = new Date(startParam);
-      endDate = new Date(endParam);
+  let startDate, endDate;
+
+  const startParam = searchParams.get('startDate');
+  const endParam = searchParams.get('endDate');
+
+  if (startParam && endParam) {
+    startDate = new Date(startParam);
+    endDate = new Date(endParam);
+  } else {
+    endDate = new Date();
+    startDate = new Date();
+
+    if (time === 'day') {
+      startDate.setDate(endDate.getDate() - 365);
     } else {
-      // Default: last 7 days for intraday, 365 days for daily
-      endDate = new Date();
-      startDate = new Date();
-      
-      if (timeframe === '1D') {
-        startDate.setDate(endDate.getDate() - 365);
-      } else {
-        startDate.setDate(endDate.getDate() - 7);
-      }
+      startDate.setDate(endDate.getDate() - 7);
     }
+  }
 
-    const formatDate = (date) => {
-      return date.toISOString().split('T')[0];
-    };
+  const formatDate = (date) => date.toISOString().split('T')[0];
 
-    // Build Finage API endpoint
-   const isCrypto = ['BTCUSD', 'ETHUSD', 'BNBUSD', 'SOLUSD'].includes(symbol);
-// or better: symbol.includes('BTC') || symbol.includes('ETH')
+  const isCrypto = ['BTCUSD', 'ETHUSD', 'BNBUSD', 'SOLUSD'].includes(symbol);
 
-const endpoint = isCrypto
-  ? `https://api.finage.co.uk/agg/crypto/${symbol}/1/${finageTimeframe}/${formatDate(startDate)}/${formatDate(endDate)}`
-  : timeframe === '1D'
-    ? `https://api.finage.co.uk/agg/forex/${symbol}/${finageTimeframe}/${formatDate(startDate)}/${formatDate(endDate)}`
-    : `https://api.finage.co.uk/agg/forex/${symbol}/${finageTimeframe}/minute/${formatDate(startDate)}/${formatDate(endDate)}`;
-    
-    const url = `${endpoint}?apikey=${apiKey}&limit=30000`;
+  const endpoint = isCrypto
+    ? `https://api.finage.co.uk/agg/crypto/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)}`
+    : `https://api.finage.co.uk/agg/forex/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)}`;
 
-    console.log(`Fetching: ${symbol} ${timeframe} from ${formatDate(startDate)} to ${formatDate(endDate)}`);
+  const url = `${endpoint}?apikey=${apiKey}&limit=5000`;
 
+  try {
     const response = await fetch(url);
-    
+
     if (!response.ok) {
-      throw new Error(`Finage API error: ${response.status} ${response.statusText}`);
+      throw new Error(`Finage API error: ${response.status}`);
     }
 
     const data = await response.json();
 
-    if (!data.results || data.results.length === 0) {
-      return Response.json({ 
-        error: 'No data available for the specified date range',
-        candles: [] 
-      });
+    if (!data.results) {
+      return Response.json({ candles: [] });
     }
 
-    // Transform to our format
-    const candles = data.results.map(candle => ({
-      timestamp: new Date(candle.t).toISOString(),
-      open: candle.o,
-      high: candle.h,
-      low: candle.l,
-      close: candle.c,
-      volume: candle.v || 0,
+    const candles = data.results.map(c => ({
+      timestamp: new Date(c.t).toISOString(),
+      open: c.o,
+      high: c.h,
+      low: c.l,
+      close: c.c,
+      volume: c.v || 0,
     }));
 
-    console.log(`Fetched ${candles.length} candles`);
-
-    return Response.json({ 
-      candles, 
-      symbol, 
+    return Response.json({
+      candles,
+      symbol,
       timeframe,
-      startDate: formatDate(startDate),
-      endDate: formatDate(endDate),
-      count: candles.length
+      count: candles.length,
     });
+
   } catch (error) {
-    console.error('Error fetching candles:', error);
-    return Response.json(
-      { error: 'Failed to fetch candle data', details: error.message },
-      { status: 500 }
-    );
+    return Response.json({
+      error: 'Failed to fetch data',
+      details: error.message
+    }, { status: 500 });
   }
-}
+        }
