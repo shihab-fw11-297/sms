@@ -53,7 +53,7 @@ export default function Home() {
   const [professionalEvaluation, setProfessionalEvaluation] = useState(null);
   const [approvedSignalsOnly, setApprovedSignalsOnly] = useState(true); // Professional filter
   const [showExplanations, setShowExplanations] = useState(true); // Help tooltips
-  const [displayMode, setDisplayMode] = useState('beginner'); // 'beginner' or 'professional'
+  const [displayMode, setDisplayMode] = useState('professional'); // 'beginner' or 'professional'
   const [showTutorial, setShowTutorial] = useState(false); // Tutorial overlay
   
   // Replay Mode (FX Replay style - optional)
@@ -964,71 +964,6 @@ export default function Home() {
               fontStyle: 'italic',
             }}>
               💡 Per PDF: Target 50-55% win rate (not 80-90%). Focus on 2-3 core setups (not 45).
-            </div>
-          </div>
-
-          {/* DISPLAY MODE TOGGLE */}
-          <div style={{
-            marginTop: '1rem',
-            padding: '1rem',
-            background: 'linear-gradient(135deg, #bc8cff20 0%, #bc8cff10 100%)',
-            border: '2px solid #bc8cff40',
-            borderRadius: '8px',
-          }}>
-            <div style={{
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              color: '#bc8cff',
-              marginBottom: '0.75rem',
-            }}>
-              🎨 Display Mode
-            </div>
-            <div style={{display: 'flex', gap: '0.5rem'}}>
-              <button
-                onClick={() => setDisplayMode('beginner')}
-                style={{
-                  flex: 1,
-                  padding: '0.75rem',
-                  background: displayMode === 'beginner' ? '#bc8cff' : 'var(--bg-tertiary)',
-                  color: displayMode === 'beginner' ? '#0d1117' : 'var(--text-primary)',
-                  border: displayMode === 'beginner' ? '2px solid #bc8cff' : '1px solid var(--border)',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem',
-                  fontWeight: displayMode === 'beginner' ? 'bold' : 'normal',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-              >
-                🌟 Beginner Mode<br/>
-                <span style={{fontSize: '0.7rem', opacity: 0.8}}>Easy to understand</span>
-              </button>
-              <button
-                onClick={() => setDisplayMode('professional')}
-                style={{
-                  flex: 1,
-                  padding: '0.75rem',
-                  background: displayMode === 'professional' ? '#bc8cff' : 'var(--bg-tertiary)',
-                  color: displayMode === 'professional' ? '#0d1117' : 'var(--text-primary)',
-                  border: displayMode === 'professional' ? '2px solid #bc8cff' : '1px solid var(--border)',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem',
-                  fontWeight: displayMode === 'professional' ? 'bold' : 'normal',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-              >
-                🎯 Professional Mode<br/>
-                <span style={{fontSize: '0.7rem', opacity: 0.8}}>Full details</span>
-              </button>
-            </div>
-            <div style={{
-              marginTop: '0.75rem',
-              fontSize: '0.7rem',
-              color: 'var(--text-secondary)',
-              fontStyle: 'italic',
-              textAlign: 'center',
-            }}>
-              💡 Beginner mode simplifies the analysis. Professional mode shows all technical details.
             </div>
           </div>
 
