@@ -714,10 +714,6 @@ export default function Home() {
         <div className="header-title">
           <h1>INSTITUTIONAL LIQUIDITY TRADER</h1>
           <span className="header-badge">TRADINGVIEW-STYLE</span>
-          <span className="header-badge">XAU/USD OPTIMIZED</span>
-        </div>
-        <div style={{fontSize: '0.75rem', color: '#6e7681', fontFamily: '"JetBrains Mono", monospace'}}>
-          Multi-Timeframe • Smart Money Concepts • Interactive Charts
         </div>
       </header>
 
