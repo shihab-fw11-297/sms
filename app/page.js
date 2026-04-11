@@ -925,48 +925,6 @@ export default function Home() {
           )}
           </div>
 
-          {/* PROFESSIONAL FILTER */}
-          <div style={{
-            marginTop: '1rem',
-            padding: '1rem',
-            background: 'linear-gradient(135deg, #00d4aa20 0%, #00d4aa10 100%)',
-            border: '2px solid #00d4aa40',
-            borderRadius: '8px',
-          }}>
-            <label style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-            }}>
-              <input
-                type="checkbox"
-                checked={approvedSignalsOnly}
-                onChange={(e) => setApprovedSignalsOnly(e.target.checked)}
-                style={{width: '18px', height: '18px', cursor: 'pointer'}}
-              />
-              <div>
-                <div style={{color: '#00d4aa', marginBottom: '0.25rem'}}>
-                  ✅ Professional Filter (Recommended)
-                </div>
-                <div style={{fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 'normal'}}>
-                  Only show signals meeting professional standards: ATR-based stops (20-40 pips), 
-                  1:2.5 RR minimum, 3+ confluence factors, regime-aligned strategies
-                </div>
-              </div>
-            </label>
-            <div style={{
-              marginTop: '0.75rem',
-              fontSize: '0.7rem',
-              color: 'var(--text-secondary)',
-              fontStyle: 'italic',
-            }}>
-              💡 Per PDF: Target 50-55% win rate (not 80-90%). Focus on 2-3 core setups (not 45).
-            </div>
-          </div>
-
           {/* REPLAY MODE TOGGLE (FX Replay Style) */}
           <div style={{
             marginTop: '1rem',
