@@ -1,8 +1,1 @@
-{
-  "crons": [
-    {
-      "path": "/api/automation/run?secret=YOUR_CRON_SECRET_HERE",
-      "schedule": "*/2 * * * *"
-    }
-  ]
-}
+
