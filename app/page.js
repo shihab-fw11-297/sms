@@ -818,6 +818,7 @@ export default function Home() {
                 <option value="XAUUSD">XAU/USD (Gold)</option>
                 <option value="EURUSD">EUR/USD</option>
                 <option value="GBPUSD">GBP/USD</option>
+                <option value="BTCUSD">BTC/USD</option>
               </select>
             </div>
 
