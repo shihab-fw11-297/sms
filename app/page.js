@@ -808,6 +808,7 @@ export default function Home() {
                 onChange={(e) => setTimeframe(e.target.value)}
               >
                 <option value="1m">1 Minute</option>
+                 <option value="2m">2 Minute</option>
                 <option value="5m">5 Minutes</option>
                 <option value="15m">15 Minutes</option>
                 <option value="1h">1 Hour</option>
