@@ -14,6 +14,7 @@ export async function GET(request) {
 
   const timeframeMap = {
     '1m': { multiply: 1, time: 'minute' },
+    '2m': { multiply: 2, time: 'minute' },
     '5m': { multiply: 5, time: 'minute' },
     '15m': { multiply: 15, time: 'minute' },
     '30m': { multiply: 30, time: 'minute' },
