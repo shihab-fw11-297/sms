@@ -52,7 +52,7 @@ export async function GET(request) {
     ? `https://api.finage.co.uk/agg/crypto/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)}`
     : `https://api.finage.co.uk/agg/forex/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)}`;
 
-  const url = `${endpoint}?apikey=${apiKey}&limit=5000`;
+  const url = `${endpoint}?apikey=${apiKey}&limit=30000`;
 
   try {
     const response = await fetch(url);
