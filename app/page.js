@@ -796,7 +796,10 @@ export default function Home() {
   <option value="BTCUSD">BTC/USD</option>
   <option value="ETHUSD">ETH/USD</option>
   <option value="BNBUSD">BNB/USD</option>
+    <option value="ETCUSD">ETC/USD</option>
   <option value="SOLUSD">SOL/USD</option>
+
+              
 </select>
             </div>
 
