@@ -774,6 +774,286 @@ export default function Home() {
   onChange={(e) => setSymbol(e.target.value)}
   disabled={dataSource === 'sample'}
 >
+  
+    
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+
+  const symbol = searchParams.get('symbol') || 'XAUUSD';
+  const timeframe = searchParams.get('timeframe') || '5m';
+
+  const apiKey = process.env.FINAGE_API_KEY;
+
+  if (!apiKey) {
+    return Response.json({
+      error: 'API key not configured'
+    }, { status: 500 });
+  }
+
+  const timeframeMap = {
+    '1m': { multiply: 1, time: 'minute' },
+    '2m': { multiply: 2, time: 'minute' },
+    '5m': { multiply: 5, time: 'minute' },
+    '15m': { multiply: 15, time: 'minute' },
+    '30m': { multiply: 30, time: 'minute' },
+    '1h': { multiply: 1, time: 'hour' },
+    '4h': { multiply: 4, time: 'hour' },
+    '1D': { multiply: 1, time: 'day' },
+  };
+
+  const { multiply, time } = timeframeMap[timeframe] || timeframeMap['5m'];
+
+  let startDate, endDate;
+
+  const startParam = searchParams.get('startDate');
+  const endParam = searchParams.get('endDate');
+
+  if (startParam && endParam) {
+    startDate = new Date(startParam);
+    endDate = new Date(endParam);
+  } else {
+    endDate = new Date();
+    startDate = new Date();
+
+    if (time === 'day') {
+      startDate.setDate(endDate.getDate() - 365);
+    } else {
+      startDate.setDate(endDate.getDate() - 7);
+    }
+  }
+
+  const formatDate = (date) => date.toISOString().split('T')[0];
+
+  const isCrypto = ['BTCUSD', 'ETHUSD', 'BNBUSD', 'SOLUSD'].includes(symbol);
+
+  const endpoint = isCrypto
+    ? https://api.finage.co.uk/agg/crypto/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)}
+    : https://api.finage.co.uk/agg/forex/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)};
+
+  const url = ${endpoint}?apikey=${apiKey}&limit=30000;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(Finage API error: ${response.status});
+    }
+
+    const data = await response.json();
+
+    if (!data.results) {
+      return Response.json({ candles: [] });
+    }
+
+    const candles = data.results.map(c => ({
+      timestamp: new Date(c.t).toISOString(),
+      open: c.o,
+      high: c.h,
+      low: c.l,
+      close: c.c,
+      volume: c.v || 0,
+    }));
+
+    return Response.json({
+      candles,
+      symbol,
+      timeframe,
+      count: candles.length,
+    });
+
+  } catch (error) {
+    return Response.json({
+      error: 'Failed to fetch data',
+      details: error.message
+    }, { status: 500 });
+  }
+        }
+
+I want to also called us stock so implemented based on that
+
+You can extend your existing handler to support US stocks by adding a stock symbol check and switching the endpoint to agg/stock.
+
+Here’s an updated version with:
+
+Forex support
+
+Crypto support
+
+US Stocks support
+
+Cleaner symbol detection
+
+Easier scalability
+
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+
+  const symbol = (searchParams.get('symbol') || 'XAUUSD').toUpperCase();
+  const timeframe = searchParams.get('timeframe') || '5m';
+
+  const apiKey = process.env.FINAGE_API_KEY;
+
+  if (!apiKey) {
+    return Response.json(
+      { error: 'API key not configured' },
+      { status: 500 }
+    );
+  }
+
+  // Timeframe mapping
+  const timeframeMap = {
+    '1m': { multiply: 1, time: 'minute' },
+    '2m': { multiply: 2, time: 'minute' },
+    '5m': { multiply: 5, time: 'minute' },
+    '15m': { multiply: 15, time: 'minute' },
+    '30m': { multiply: 30, time: 'minute' },
+    '1h': { multiply: 1, time: 'hour' },
+    '4h': { multiply: 4, time: 'hour' },
+    '1D': { multiply: 1, time: 'day' },
+  };
+
+  const { multiply, time } =
+    timeframeMap[timeframe] || timeframeMap['5m'];
+
+  // Date handling
+  let startDate, endDate;
+
+  const startParam = searchParams.get('startDate');
+  const endParam = searchParams.get('endDate');
+
+  if (startParam && endParam) {
+    startDate = new Date(startParam);
+    endDate = new Date(endParam);
+  } else {
+    endDate = new Date();
+    startDate = new Date();
+
+    if (time === 'day') {
+      startDate.setDate(endDate.getDate() - 365);
+    } else {
+      startDate.setDate(endDate.getDate() - 7);
+    }
+  }
+
+  const formatDate = (date) =>
+    date.toISOString().split('T')[0];
+
+  // Asset detection
+  const cryptoSymbols = ['BTCUSD', 'ETHUSD', 'BNBUSD', 'SOLUSD'];
+
+  const forexSymbols = [
+    'XAUUSD',
+    'EURUSD',
+    'GBPUSD',
+    'USDJPY',
+    'AUDUSD',
+    'USDCAD',
+    'USDCHF',
+    'NZDUSD',
+  ];
+
+  let marketType = 'stock';
+
+  if (cryptoSymbols.includes(symbol)) {
+    marketType = 'crypto';
+  } else if (forexSymbols.includes(symbol)) {
+    marketType = 'forex';
+  }
+
+  // Build endpoint
+  let endpoint = '';
+
+  switch (marketType) {
+    case 'crypto':
+      endpoint = `https://api.finage.co.uk/agg/crypto/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)}`;
+      break;
+
+    case 'forex':
+      endpoint = `https://api.finage.co.uk/agg/forex/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)}`;
+      break;
+
+    case 'stock':
+    default:
+      endpoint = `https://api.finage.co.uk/agg/stock/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)}`;
+      break;
+  }
+
+  const url = `${endpoint}?apikey=${apiKey}&limit=30000`;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Finage API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.results) {
+      return Response.json({
+        candles: [],
+        symbol,
+        timeframe,
+        marketType,
+      });
+    }
+
+    const candles = data.results.map((c) => ({
+      timestamp: new Date(c.t).toISOString(),
+      open: c.o,
+      high: c.h,
+      low: c.l,
+      close: c.c,
+      volume: c.v || 0,
+    }));
+
+    return Response.json({
+      candles,
+      symbol,
+      timeframe,
+      marketType,
+      count: candles.length,
+    });
+  } catch (error) {
+    return Response.json(
+      {
+        error: 'Failed to fetch data',
+        details: error.message,
+      },
+      { status: 500 }
+    );
+  }
+}
+Now you can call:
+
+/api/data?symbol=AAPL&timeframe=5m
+or
+
+/api/data?symbol=TSLA&timeframe=1h
+Examples:
+
+Market	Symbol
+Forex	XAUUSD
+Crypto	BTCUSD
+US Stock	AAPL
+US Stock	NVDA
+US Stock	MSFT
+You can improve this further by:
+
+auto-detecting stocks dynamically
+
+supporting indices (SPY, QQQ)
+
+adding caching
+
+validating symbols
+
+adding pre/post market support
+
+handling pagination for huge datasets
+
+
+>
   {/* Metals */}
   <option value="XAUUSD">XAU/USD (Gold)</option>
 
@@ -799,7 +1079,349 @@ export default function Home() {
     <option value="ETCUSD">ETC/USD</option>
   <option value="SOLUSD">SOL/USD</option>
 
-              
+You should now also add a US Stocks section inside your <select>.
+
+Example:
+
+<>
+  {/* Metals */}
+  <option value="XAUUSD">XAU/USD (Gold)</option>
+
+  {/* Major Forex */}
+  <option value="EURUSD">EUR/USD</option>
+  <option value="GBPUSD">GBP/USD</option>
+  <option value="USDJPY">USD/JPY</option>
+  <option value="USDCHF">USD/CHF</option>
+  <option value="USDCAD">USD/CAD</option>
+  <option value="AUDUSD">AUD/USD</option>
+  <option value="NZDUSD">NZD/USD</option>
+
+  {/* Cross pairs */}
+  <option value="EURGBP">EUR/GBP</option>
+  <option value="EURJPY">EUR/JPY</option>
+  <option value="GBPJPY">GBP/JPY</option>
+  <option value="AUDJPY">AUD/JPY</option>
+
+  {/* Crypto */}
+  <option value="BTCUSD">BTC/USD</option>
+  <option value="ETHUSD">ETH/USD</option>
+  <option value="BNBUSD">BNB/USD</option>
+  <option value="ETCUSD">ETC/USD</option>
+  <option value="SOLUSD">SOL/USD</option>
+
+  {/* US Stocks */}
+  <option value="AAPL">Apple (AAPL)</option>
+  <option value="MSFT">Microsoft (MSFT)</option>
+  <option value="NVDA">NVIDIA (NVDA)</option>
+  <option value="TSLA">Tesla (TSLA)</option>
+  <option value="AMZN">Amazon (AMZN)</option>
+  <option value="META">Meta (META)</option>
+  <option value="GOOGL">Google (GOOGL)</option>
+  <option value="NFLX">Netflix (NFLX)</option>
+  <option value="AMD">AMD (AMD)</option>
+  <option value="INTC">Intel (INTC)</option>
+
+  {/* ETFs / Indices */}
+  <option value="SPY">SPY (S&P 500 ETF)</option>
+  <option value="QQQ">QQQ (Nasdaq ETF)</option>
+  <option value="DIA">DIA (Dow Jones ETF)</option>
+</>
+Also update your backend detection logic because currently only a few forex pairs are recognized.
+
+Replace this:
+
+const forexSymbols = [
+  'XAUUSD',
+  'EURUSD',
+  'GBPUSD',
+  'USDJPY',
+  'AUDUSD',
+  'USDCAD',
+  'USDCHF',
+  'NZDUSD',
+];
+with:
+
+const forexSymbols = [
+  'XAUUSD',
+
+  'EURUSD',
+  'GBPUSD',
+  'USDJPY',
+  'USDCHF',
+  'USDCAD',
+  'AUDUSD',
+  'NZDUSD',
+
+  'EURGBP',
+  'EURJPY',
+  'GBPJPY',
+  'AUDJPY',
+];
+And update crypto list too:
+
+const cryptoSymbols = [
+  'BTCUSD',
+  'ETHUSD',
+  'BNBUSD',
+  'ETCUSD',
+  'SOLUSD',
+];
+Everything else will automatically work for stocks because your default market type is already:
+
+let marketType = 'stock';
+So symbols like:
+
+AAPL
+
+TSLA
+
+NVDA
+
+SPY
+
+will hit:
+
+https://api.finage.co.uk/agg/stock/
+automatically.
+
+
+Give complete file updates 1st
+
+// app/api/market-data/route.js
+
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+
+  const symbol = (searchParams.get('symbol') || 'XAUUSD').toUpperCase();
+  const timeframe = searchParams.get('timeframe') || '5m';
+
+  const apiKey = process.env.FINAGE_API_KEY;
+
+  if (!apiKey) {
+    return Response.json(
+      {
+        error: 'API key not configured',
+      },
+      { status: 500 }
+    );
+  }
+
+  // =========================
+  // TIMEFRAME MAP
+  // =========================
+  const timeframeMap = {
+    '1m': { multiply: 1, time: 'minute' },
+    '2m': { multiply: 2, time: 'minute' },
+    '5m': { multiply: 5, time: 'minute' },
+    '15m': { multiply: 15, time: 'minute' },
+    '30m': { multiply: 30, time: 'minute' },
+    '1h': { multiply: 1, time: 'hour' },
+    '4h': { multiply: 4, time: 'hour' },
+    '1D': { multiply: 1, time: 'day' },
+  };
+
+  const { multiply, time } =
+    timeframeMap[timeframe] || timeframeMap['5m'];
+
+  // =========================
+  // DATE RANGE
+  // =========================
+  let startDate;
+  let endDate;
+
+  const startParam = searchParams.get('startDate');
+  const endParam = searchParams.get('endDate');
+
+  if (startParam && endParam) {
+    startDate = new Date(startParam);
+    endDate = new Date(endParam);
+  } else {
+    endDate = new Date();
+    startDate = new Date();
+
+    // Longer history for daily timeframe
+    if (time === 'day') {
+      startDate.setDate(endDate.getDate() - 365);
+    } else {
+      startDate.setDate(endDate.getDate() - 7);
+    }
+  }
+
+  const formatDate = (date) =>
+    date.toISOString().split('T')[0];
+
+  // =========================
+  // MARKET TYPE DETECTION
+  // =========================
+
+  // Crypto Symbols
+  const cryptoSymbols = [
+    'BTCUSD',
+    'ETHUSD',
+    'BNBUSD',
+    'ETCUSD',
+    'SOLUSD',
+  ];
+
+  // Forex & Metals
+  const forexSymbols = [
+    'XAUUSD',
+
+    'EURUSD',
+    'GBPUSD',
+    'USDJPY',
+    'USDCHF',
+    'USDCAD',
+    'AUDUSD',
+    'NZDUSD',
+
+    'EURGBP',
+    'EURJPY',
+    'GBPJPY',
+    'AUDJPY',
+  ];
+
+  // Default = stock
+  let marketType = 'stock';
+
+  if (cryptoSymbols.includes(symbol)) {
+    marketType = 'crypto';
+  } else if (forexSymbols.includes(symbol)) {
+    marketType = 'forex';
+  }
+
+  // =========================
+  // BUILD ENDPOINT
+  // =========================
+  let endpoint = '';
+
+  switch (marketType) {
+    case 'crypto':
+      endpoint = `https://api.finage.co.uk/agg/crypto/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)}`;
+      break;
+
+    case 'forex':
+      endpoint = `https://api.finage.co.uk/agg/forex/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)}`;
+      break;
+
+    case 'stock':
+    default:
+      endpoint = `https://api.finage.co.uk/agg/stock/${symbol}/${multiply}/${time}/${formatDate(startDate)}/${formatDate(endDate)}`;
+      break;
+  }
+
+  const url = `${endpoint}?apikey=${apiKey}&limit=30000`;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Finage API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Empty response
+    if (!data.results) {
+      return Response.json({
+        candles: [],
+        symbol,
+        timeframe,
+        marketType,
+        count: 0,
+      });
+    }
+
+    // Normalize candles
+    const candles = data.results.map((candle) => ({
+      timestamp: new Date(candle.t).toISOString(),
+      open: candle.o,
+      high: candle.h,
+      low: candle.l,
+      close: candle.c,
+      volume: candle.v || 0,
+    }));
+
+    return Response.json({
+      candles,
+      symbol,
+      timeframe,
+      marketType,
+      count: candles.length,
+    });
+  } catch (error) {
+    console.error('Finage fetch error:', error);
+
+    return Response.json(
+      {
+        error: 'Failed to fetch market data',
+        details: error.message,
+      },
+      { status: 500 }
+    );
+  }
+}
+// Symbol Select Component
+
+<select
+  value={symbol}
+  onChange={(e) => setSymbol(e.target.value)}
+  className="border rounded-lg px-3 py-2"
+>
+  {/* Metals */}
+  <optgroup label="Metals">
+    <option value="XAUUSD">XAU/USD (Gold)</option>
+  </optgroup>
+
+  {/* Major Forex */}
+  <optgroup label="Major Forex">
+    <option value="EURUSD">EUR/USD</option>
+    <option value="GBPUSD">GBP/USD</option>
+    <option value="USDJPY">USD/JPY</option>
+    <option value="USDCHF">USD/CHF</option>
+    <option value="USDCAD">USD/CAD</option>
+    <option value="AUDUSD">AUD/USD</option>
+    <option value="NZDUSD">NZD/USD</option>
+  </optgroup>
+
+  {/* Cross Pairs */}
+  <optgroup label="Cross Pairs">
+    <option value="EURGBP">EUR/GBP</option>
+    <option value="EURJPY">EUR/JPY</option>
+    <option value="GBPJPY">GBP/JPY</option>
+    <option value="AUDJPY">AUD/JPY</option>
+  </optgroup>
+
+  {/* Crypto */}
+  <optgroup label="Crypto">
+    <option value="BTCUSD">BTC/USD</option>
+    <option value="ETHUSD">ETH/USD</option>
+    <option value="BNBUSD">BNB/USD</option>
+    <option value="ETCUSD">ETC/USD</option>
+    <option value="SOLUSD">SOL/USD</option>
+  </optgroup>
+
+  {/* US Stocks */}
+  <optgroup label="US Stocks">
+    <option value="AAPL">Apple (AAPL)</option>
+    <option value="MSFT">Microsoft (MSFT)</option>
+    <option value="NVDA">NVIDIA (NVDA)</option>
+    <option value="TSLA">Tesla (TSLA)</option>
+    <option value="AMZN">Amazon (AMZN)</option>
+    <option value="META">Meta (META)</option>
+    <option value="GOOGL">Google (GOOGL)</option>
+    <option value="NFLX">Netflix (NFLX)</option>
+    <option value="AMD">AMD (AMD)</option>
+    <option value="INTC">Intel (INTC)</option>
+  </optgroup>
+
+  {/* ETFs / Index */}
+  <optgroup label="ETFs / Index">
+    <option value="SPY">SPY (S&P 500 ETF)</option>
+    <option value="QQQ">QQQ (Nasdaq ETF)</option>
+    <option value="DIA">DIA (Dow Jones ETF)</option>
+  </optgroup>          
 </select>
             </div>
 
