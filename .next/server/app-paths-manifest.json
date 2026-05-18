@@ -1,0 +1,10 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/automation/route": "app/api/automation/route.js",
+  "/api/backtest/route": "app/api/backtest/route.js",
+  "/api/candles/route": "app/api/candles/route.js",
+  "/api/backtest/run/route": "app/api/backtest/run/route.js",
+  "/api/monitor/route": "app/api/monitor/route.js",
+  "/api/automation/run/route": "app/api/automation/run/route.js",
+  "/page": "app/page.js"
+}
